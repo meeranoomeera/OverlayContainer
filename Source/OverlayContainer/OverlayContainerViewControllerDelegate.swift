@@ -164,4 +164,7 @@ public protocol OverlayContainerViewControllerDelegate: AnyObject {
     func overlayContainerViewController(_ containerViewController: OverlayContainerViewController,
                                         canReachNotchAt index: Int,
                                         forOverlay overlayViewController: UIViewController) -> Bool
+	
+	func overlayContainerShouldBeginDragging() -> Bool
+	func overlayContainerShouldRecognizeSimultaneously() -> Bool
 }
