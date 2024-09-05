@@ -89,7 +89,8 @@ open class OverlayContainerViewController: UIViewController {
     public let style: OverlayStyle
 
     internal lazy var kbObserver: KeyboardObserverInterface = KeyboardObserver()
-    internal var pinnedView: PassThroughView?
+    internal var meera_pinnedViewContainer: PassThroughView?
+    internal var meera_previewContainer: PassThroughView?
 
     private lazy var overlayPanGesture: OverlayTranslationGestureRecognizer = self.makePanGesture()
     private lazy var overlayContainerView = OverlayContainerView()
@@ -105,17 +106,9 @@ open class OverlayContainerViewController: UIViewController {
 		)
 	)
 
-    internal var pinnedViewBottomConstraint: NSLayoutConstraint? {
-        didSet {
-            debugPrint("pinnedViewBottomConstraint, \(pinnedViewBottomConstraint?.constant ?? 0)")
-        }
-    }
-    internal var finalBottomContraintValue: CGFloat = 0 {
-        didSet {
-            debugPrint("finalBottomContraintValue, \(finalBottomContraintValue)")
-        }
-    }
-    internal var keyboardHeight: CGFloat = 0
+    internal var meera_pinnedViewBottomConstraint: NSLayoutConstraint?
+    internal var meera_finalBottomContraintValue: CGFloat = 0
+    internal var meera_keyboardHeight: CGFloat = 0
     private var overlayContainerViewStyleConstraint: NSLayoutConstraint?
     private var translationHeightConstraint: NSLayoutConstraint?
 
@@ -197,9 +190,15 @@ open class OverlayContainerViewController: UIViewController {
 
     open override func viewDidLoad() {
         super.viewDidLoad()
-        loadOverlayPinnedView()
+        meera_loadOverlayPinnedView()
         setUpPanGesture()
-        setupKeyboardObserver()
+        meera_setupKeyboardObserver()
+    }
+
+    open override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        meera_loadOverlayPreviewView()
+        meera_animatePreviewIn()
     }
 
     open override func viewWillLayoutSubviews() {
@@ -280,7 +279,7 @@ open class OverlayContainerViewController: UIViewController {
 		}
 	}
 	
-	internal func baseAnimation(animations: @escaping () -> Void) {
+	internal func baseAnimation(animations: @escaping () -> Void, completion: ((UIViewAnimatingPosition) -> Void)? = nil) {
 		let timing = UISpringTimingParameters(
 			mass: 1,
 			stiffness: pow(2 * .pi / 0.3, 2),
@@ -294,6 +293,9 @@ open class OverlayContainerViewController: UIViewController {
 		animator.addAnimations {
 			animations()
 		}
+        animator.addCompletion { uiViewAnimatingPosition in
+            completion?(uiViewAnimatingPosition)
+        }
 		animator.startAnimation()
 	}
 
@@ -547,12 +549,13 @@ extension OverlayContainerViewController: HeightConstraintOverlayTranslationCont
             toNotchAt: index
         )
 
-			hideKeyboardIfNeeded(forNotch: index)
-			// TODO: func
-			if configuration.heightForNotch(at: index) == 0 {
-				self.finalBottomContraintValue = self.translationHeightConstraint?.constant ?? -700
-				self.updatePinnedViewConstraints(nil)
-			}
+        meera_hideKeyboardIfNeeded(forNotch: index)
+        // TODO: func
+        if configuration.heightForNotch(at: index) == 0 {
+            self.meera_finalBottomContraintValue = self.translationHeightConstraint?.constant ?? -700
+            self.meera_updatePinnedViewConstraints(nil)
+            self.meera_animatePreviewOut()
+        }
     }
 
     func translationControllerWillStartDraggingOverlay(_ translationController: OverlayTranslationController) {
@@ -593,10 +596,10 @@ extension OverlayContainerViewController: HeightConstraintOverlayTranslationCont
             self?.updateOverlayContainerConstraints()
             if context is InterruptibleAnimatorOverlayContainerTransitionCoordinator {
 							if context.targetTranslationHeight != 0 {
-								self?.updatePinnedViewConstraints(nil)
+								self?.meera_updatePinnedViewConstraints(nil)
 							}
             } else {
-                self?.updatePinnedViewConstraints(context)
+                self?.meera_updatePinnedViewConstraints(context)
             }
             self?.overlayTranslationContainerView.layoutIfNeeded()
         }, completion: nil)

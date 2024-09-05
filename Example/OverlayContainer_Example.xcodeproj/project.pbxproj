@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B30E2A9C2C8A3A36001C785D /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B30E2A9B2C8A3A36001C785D /* Media.xcassets */; };
 		B3207B312C81FFAE00DEF099 /* OverlayContainer in Embed Frameworks */ = {isa = PBXBuildFile; productRef = E774DEFA29352E8D0032DDBA /* OverlayContainer */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		E7022C91222699BD00AD86B5 /* ModalNavigationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7022C90222699BD00AD86B5 /* ModalNavigationViewController.swift */; };
 		E7397E7E244079C200AAAD57 /* ActivityControllerPresentationLikeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7397E7D244079C200AAAD57 /* ActivityControllerPresentationLikeViewController.swift */; };
@@ -44,6 +45,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B30E2A9B2C8A3A36001C785D /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Media.xcassets; sourceTree = "<group>"; };
 		E7022C90222699BD00AD86B5 /* ModalNavigationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalNavigationViewController.swift; sourceTree = "<group>"; };
 		E7397E7D244079C200AAAD57 /* ActivityControllerPresentationLikeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityControllerPresentationLikeViewController.swift; sourceTree = "<group>"; };
 		E774DEF829352E7C0032DDBA /* OverlayContainer */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = OverlayContainer; path = ..; sourceTree = "<group>"; };
@@ -80,6 +82,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B30E2A9A2C8A3A25001C785D /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				B30E2A9B2C8A3A36001C785D /* Media.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		E7022C8F2226983A00AD86B5 /* Navigation */ = {
 			isa = PBXGroup;
 			children = (
@@ -133,6 +143,7 @@
 		E78485D92201E8E900DE64C3 /* OverlayContainer_Example */ = {
 			isa = PBXGroup;
 			children = (
+				B30E2A9A2C8A3A25001C785D /* Resources */,
 				E7397E7C2440798400AAAD57 /* Present Overlay */,
 				E791BAA5225F5E8800124D27 /* Disable Notch */,
 				E7C4C67722256D93009AD786 /* Modal Navigation */,
@@ -275,6 +286,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E78486062201E95E00DE64C3 /* DetailHeaderView.xib in Resources */,
+				B30E2A9C2C8A3A36001C785D /* Media.xcassets in Resources */,
 				E78486032201E95E00DE64C3 /* MapsLikeViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

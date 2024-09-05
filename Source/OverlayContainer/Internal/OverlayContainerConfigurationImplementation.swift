@@ -54,6 +54,14 @@ class OverlayContainerConfigurationImplementation: OverlayContainerConfiguration
         return delegate?.overlayPinnedViewConfig()
     }
 
+    func overlayPreviewViewConfig() -> OverlayPreviewViewConfig? {
+        return delegate?.overlayPreviewViewConfig()
+    }
+
+    func overlayDidDisplayPreview(view: UIView?) {
+        delegate?.overlayDidDisplayPreview(view: view)
+    }
+
     func overlayKeyboardPolicy() -> KeyboardPolicy? {
         return delegate?.overlayKeyboardPolicy()
     }

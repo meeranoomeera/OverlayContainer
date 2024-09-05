@@ -4,16 +4,16 @@ class SafeAreaBottomView: UIView {}
 
 extension OverlayContainerViewController {
 
-	public func meera_invalidatePinnedView() {
-		guard isViewLoaded else { return }
-		if let pinnedView {
-			pinnedView.removeFromSuperview()
-		}
+    public func meera_invalidatePinnedView() {
+        guard isViewLoaded else { return }
+        if let meera_pinnedViewContainer {
+            meera_pinnedViewContainer.removeFromSuperview()
+        }
 
-		loadOverlayPinnedView()
-	}
+        meera_loadOverlayPinnedView()
+    }
 
-    internal func loadOverlayPinnedView() {
+    internal func meera_loadOverlayPinnedView() {
         guard let pinnedViewConfig = configuration.overlayPinnedViewConfig(),
               let _pinnedView = pinnedViewConfig.pinnedView else {
             return
@@ -23,20 +23,20 @@ extension OverlayContainerViewController {
         overlayTranslationContainerView.addSubview(pinnedViewContainer)
         pinnedViewContainer.pinToSuperview(with: .zero , edges: [.left, .right, .top])
 
-        pinnedViewBottomConstraint = pinnedViewContainer.bottomAnchor.constraint(
+        meera_pinnedViewBottomConstraint = pinnedViewContainer.bottomAnchor.constraint(
             equalTo: overlayTranslationContainerView.bottomAnchor
         )
-        pinnedViewBottomConstraint?.isActive = true
+        meera_pinnedViewBottomConstraint?.isActive = true
 
-        self.pinnedView = pinnedViewContainer
+        self.meera_pinnedViewContainer = pinnedViewContainer
 
         switch pinnedViewConfig.safeAreaPolicy {
         case .ignore:
             switch pinnedViewConfig.constraintsMode {
             case .set(let insets, let edges, let height, let width):
                 pinnedViewContainer.addSubview(_pinnedView)
-							// TODO: возможно это стоит поменять
-							_pinnedView.frame.origin = .init(x: 0, y: UIScreen.main.bounds.height)
+                // TODO: возможно это стоит поменять
+                _pinnedView.frame.origin = .init(x: 0, y: UIScreen.main.bounds.height)
                 _pinnedView.translatesAutoresizingMaskIntoConstraints = false
                 _pinnedView.pinToSuperview(with: insets, edges: edges)
                 if let height {
@@ -47,7 +47,7 @@ extension OverlayContainerViewController {
                 }
             case .getExisting:
                 // задержка чтобы получить parent у pinnedView
-							DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
                     self?.adjustPinnedIfNeeded(
                         pinnedView: _pinnedView,
                         container: pinnedViewContainer,
@@ -60,8 +60,8 @@ extension OverlayContainerViewController {
             switch pinnedViewConfig.constraintsMode {
             case .set(let insets, let edges, let height, let width):
                 pinnedViewContainer.addSubview(_pinnedView)
-							// TODO: возможно это стоит поменять
-							_pinnedView.frame.origin = .init(x: 0, y: UIScreen.main.bounds.height)
+                // TODO: возможно это стоит поменять
+                _pinnedView.frame.origin = .init(x: 0, y: UIScreen.main.bounds.height)
                 _pinnedView.translatesAutoresizingMaskIntoConstraints = false
                 _pinnedView.pinToSuperview(with: insets, edges: edges)
                 if let height {
@@ -76,7 +76,7 @@ extension OverlayContainerViewController {
                 ).isActive = true
             case .getExisting:
                 // задержка чтобы получить parent у pinnedView
-							DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
                     self?.adjustPinnedIfNeeded(
                         pinnedView: _pinnedView,
                         container: pinnedViewContainer,
@@ -93,13 +93,13 @@ extension OverlayContainerViewController {
             safeAreaView.pinToSuperview(edges: [.left, .right, .bottom])
 
             // задержка чтобы получить значение safe area
-					DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
                 safeAreaView.heightAnchor.constraint(equalToConstant: self?.view.safeAreaInsets.bottom ?? 0).isActive = true
             }
         }
     }
 
-    internal func updatePinnedViewConstraints(_ context: OverlayContainerTransitionCoordinatorContext?) {
+    internal func meera_updatePinnedViewConstraints(_ context: OverlayContainerTransitionCoordinatorContext?) {
         guard let pinnedViewConfig = configuration.overlayPinnedViewConfig() else {
             return
         }
@@ -107,9 +107,9 @@ extension OverlayContainerViewController {
         guard let context else {
             baseAnimation { [weak self] in
                 guard let self else { return }
-                self.pinnedViewBottomConstraint?.constant = self.finalBottomContraintValue
-                self.pinnedViewBottomConstraint?.isActive = true
-                self.pinnedView?.layoutIfNeeded()
+                self.meera_pinnedViewBottomConstraint?.constant = self.meera_finalBottomContraintValue
+                self.meera_pinnedViewBottomConstraint?.isActive = true
+                self.meera_pinnedViewContainer?.layoutIfNeeded()
             }
             return
         }
@@ -118,18 +118,18 @@ extension OverlayContainerViewController {
         if let heightToStartMoveDown = pinnedViewConfig.heightToStartMoveDown {
             minHeight = heightToStartMoveDown
         }
-        let diff = context.overlayTranslationHeight - (minHeight + -finalBottomContraintValue) - keyboardHeight // если будут проблемы иначе хэндлить высоту клавиатуры
-/*
+        let diff = context.overlayTranslationHeight - (minHeight + -meera_finalBottomContraintValue) - meera_keyboardHeight // если будут проблемы иначе хэндлить высоту клавиатуры
+        /*
          debugPrint("\n")
          debugPrint("context.overlayTranslationHeight \(context.overlayTranslationHeight)")
          debugPrint("context.minimumHeight \(minHeight)")
          debugPrint("finalBottomContraintValue) \(finalBottomContraintValue)")
          debugPrint("minHeight + -finalBottomContraintValue \(minHeight + -finalBottomContraintValue)")
          debugPrint("diff \(diff)")
-  */
+         */
         if diff < 0 {
-            pinnedViewBottomConstraint?.constant = finalBottomContraintValue - diff
-            pinnedViewBottomConstraint?.isActive = true
+            meera_pinnedViewBottomConstraint?.constant = meera_finalBottomContraintValue - diff
+            meera_pinnedViewBottomConstraint?.isActive = true
         }
     }
 
@@ -155,7 +155,7 @@ extension OverlayContainerViewController {
                 constant: $0.constant
             )
             if constraint.firstAttribute == .bottom {
-                self.pinnedViewBottomConstraint = constraint
+                self.meera_pinnedViewBottomConstraint = constraint
                 constraint.priority = .defaultHigh
             }
             return constraint

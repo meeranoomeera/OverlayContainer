@@ -105,5 +105,27 @@ extension ModalNavigationViewController: OverlayContainerViewControllerDelegate 
     func overlayKeyboardPolicy() -> KeyboardPolicy? {
         .switchToLongFormWithPinndedView(-25)
     }
+
+    func overlayPreviewViewConfig() -> OverlayPreviewViewConfig? {
+        guard let imageView = (overlayNavigationController.topViewController as? SearchViewController)?.imageView else {
+            return nil
+        }
+
+        let previewSizeOptions: [PreviewSizeOption] = [
+            .fillByMinSide(multiply: 0.7, W_HAspect: 1)
+        ]
+        return OverlayPreviewViewConfig(
+            previewView: .image(
+                sourceView: imageView,
+                url: nil
+            ),
+            previewSizeOption: previewSizeOptions,
+            previewTransitionOption: [
+                .viewToViewIn,
+                .viewToViewOut
+            ],
+            distanceToContainer: 50
+        )
+    }
 }
 

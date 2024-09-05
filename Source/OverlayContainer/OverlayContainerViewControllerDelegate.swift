@@ -24,6 +24,12 @@ public protocol OverlayContainerViewControllerDelegate: AnyObject {
     /// - returns: OverlayPinnedViewConfig.
     func overlayPinnedViewConfig() -> OverlayPinnedViewConfig?
 
+    func overlayPreviewViewConfig() -> OverlayPreviewViewConfig?
+
+    /// Notifies the delegate after the pan modal preview is displayed .
+    /// Default value is an empty implementation.
+    func overlayDidDisplayPreview(view: UIView?)
+
     /// Asks the delegate for the KeyboardPolicy
     /// **Required**.
     ///

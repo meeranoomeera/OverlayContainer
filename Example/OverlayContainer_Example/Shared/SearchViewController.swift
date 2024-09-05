@@ -25,6 +25,8 @@ class SearchViewController: UIViewController,
     private(set) lazy var tableView = UITableView()
     private(set) lazy var button = UIButton()
     private(set) lazy var someView = UIView()
+    
+    private(set) lazy var imageView = UIImageView()
 
 	var onTapHandler: (() -> Void)?
 
@@ -80,10 +82,10 @@ class SearchViewController: UIViewController,
         view.addSubview(tableView)
         view.addSubview(header)
         view.addSubview(button)
+        view.addSubview(imageView)
 
         button.heightAnchor.constraint(equalToConstant: 50).isActive = true
         button.pinToSuperview(edges: [.left, .right, .bottom])
-
 
         header.heightAnchor.constraint(equalToConstant: 70).isActive = true
         header.pinToSuperview(edges: [.left, .right])
@@ -102,6 +104,14 @@ class SearchViewController: UIViewController,
         button.setTitleColor(.blue, for: .normal)
 
         header.searchBar.isUserInteractionEnabled = true
+
+        imageView.image = UIImage(named: "preview")
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        imageView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        imageView.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        imageView.widthAnchor.constraint(equalToConstant: 100).isActive = true
+
     }
 
 	@objc func onTap() {
