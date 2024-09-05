@@ -1,6 +1,6 @@
 import Foundation
 
-public enum PreviewTransitionOption {
+public enum OverlayPreviewTransitionOption {
     case fadeIn
     case fadeOut
     case viewToViewIn

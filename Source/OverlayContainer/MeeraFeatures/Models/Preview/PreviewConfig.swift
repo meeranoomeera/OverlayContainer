@@ -3,9 +3,9 @@ import Foundation
 public struct OverlayPreviewViewConfig {
     
     public init(
-        previewView: PreviewItem?,
-        previewSizeOption: [PreviewSizeOption]? = nil,
-        previewTransitionOption: [PreviewTransitionOption]? = nil,
+        previewView: OverlayPreviewItem?,
+        previewSizeOption: [OverlayPreviewSizeOption]? = nil,
+        previewTransitionOption: [OverlayPreviewTransitionOption]? = nil,
         distanceToContainer: CGFloat = 50
     ) {
         self.previewView = previewView
@@ -14,8 +14,8 @@ public struct OverlayPreviewViewConfig {
         self.distanceToContainer = distanceToContainer
     }
     
-    var previewView: PreviewItem?
-    var previewSizeOption: [PreviewSizeOption]?
-    var previewTransitionOption: [PreviewTransitionOption]?
+    var previewView: OverlayPreviewItem?
+    var previewSizeOption: [OverlayPreviewSizeOption]?
+    var previewTransitionOption: [OverlayPreviewTransitionOption]?
     var distanceToContainer: CGFloat
 }

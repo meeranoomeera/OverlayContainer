@@ -1,6 +1,6 @@
 import Foundation
 
-public enum PreviewSizeOption {
+public enum OverlayPreviewSizeOption {
 
     case fixedPreviewSize(CGSize)
 

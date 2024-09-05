@@ -111,7 +111,7 @@ extension ModalNavigationViewController: OverlayContainerViewControllerDelegate 
             return nil
         }
 
-        let previewSizeOptions: [PreviewSizeOption] = [
+        let previewSizeOptions: [OverlayPreviewSizeOption] = [
             .fillByMinSide(multiply: 0.7, W_HAspect: 1)
         ]
         return OverlayPreviewViewConfig(

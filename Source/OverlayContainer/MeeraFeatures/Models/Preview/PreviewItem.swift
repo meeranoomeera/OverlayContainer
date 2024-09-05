@@ -4,13 +4,13 @@ import AVFoundation
 //import Kingfisher
 //import Lottie
 
-public enum PreviewItem {
+public enum OverlayPreviewItem {
     case gif(sourceView: UIView, url: URL?)
     case image(sourceView: UIView, url: URL?)
     case animation(sourceView: UIView, url: URL?)
     case video(item: AVPlayerItem, sourceView: UIView)
     case view(sourceView: UIView)
-    case loadable(state: (@escaping ((LoadablaItemState) -> Void)) -> (), sourceView: UIView)
+    case loadable(state: (@escaping ((OverlayLoadablaItemState) -> Void)) -> (), sourceView: UIView)
     
     var sourceView: UIView {
         switch self {
@@ -70,7 +70,7 @@ public enum PreviewItem {
     }
 }
 
-public enum LoadablaItemState {
+public enum OverlayLoadablaItemState {
     case loading
     case loaded(UIView)
     case failed
