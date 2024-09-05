@@ -57,4 +57,6 @@ public extension OverlayContainerViewControllerDelegate {
 
     func overlayPinnedViewConfig() -> OverlayPinnedViewConfig? { nil }
     func overlayKeyboardPolicy() -> KeyboardPolicy? { nil }
+	func overlayContainerShouldBeginDragging() -> Bool { true }
+	func overlayContainerShouldRecognizeSimultaneously() -> Bool { false }
 }
