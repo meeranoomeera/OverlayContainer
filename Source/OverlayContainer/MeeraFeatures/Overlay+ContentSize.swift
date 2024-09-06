@@ -29,12 +29,14 @@ extension OverlayContainerViewController {
 		leftInsetConstraint?.isActive = true
 		rightInsetConstraint?.isActive = true
 		
-		dashView.frame.origin.x = -left
 		
 		if animated {
 			baseAnimation { [weak self] in
 				self?.overlayTranslationView.layoutIfNeeded()
+				self?.dashView.frame.origin.x = -left
 			}
+		} else {
+			dashView.frame.origin.x = -left
 		}
 	}
 	
