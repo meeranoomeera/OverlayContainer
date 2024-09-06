@@ -111,8 +111,12 @@ class ScrollViewOverlayTranslationDriver: OverlayTranslationDriver, OverlayScrol
     // MARK: - Private
 
     private func shouldDragOverlay(following scrollView: UIScrollView) -> Bool {
-        guard let controller = translationController, scrollView.isTracking else { return false }
-        let velocity = scrollView.panGestureRecognizer.velocity(in: nil).y
+		guard let controller = translationController, 
+				scrollView.isTracking
+		else {
+			return translationController?.translationPosition == .inFlight
+		}        
+		let velocity = scrollView.panGestureRecognizer.velocity(in: nil).y
         let movesUp = velocity < 0
         switch controller.translationPosition {
         case .bottom:
