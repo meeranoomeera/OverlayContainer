@@ -1,8 +1,10 @@
 import Foundation
 
-public enum OverlayPreviewTransitionOption {
+public enum OverlayPreviewTransitionOption: Equatable {
     case fadeIn
     case fadeOut
     case viewToViewIn
     case viewToViewOut
+    case cornerRadiusIn
+    case cornerRadiusOut
 }

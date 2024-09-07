@@ -10,16 +10,16 @@ import OverlayContainer
 import UIKit
 
 class ModalNavigationViewController: UIViewController, SearchViewControllerDelegate {
-
+    
     enum OverlayNotch: Int, CaseIterable {
         case minimum, maximum
     }
-
+    
     private let overlayController = OverlayContainerViewController()
     private let overlayNavigationController = OverlayNavigationViewController()
-
+    
     // MARK: - UIViewController
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         overlayController.delegate = self
@@ -28,19 +28,19 @@ class ModalNavigationViewController: UIViewController, SearchViewControllerDeleg
         pushSearchViewController()
         addChild(overlayController, in: view)
     }
-
+    
     // MARK: - SearchViewControllerDelegate
-
+    
     func searchViewControllerDidSelectARow(_ searchViewController: SearchViewController) {
         pushSearchViewController()
     }
-
+    
     func searchViewControllerDidSelectCloseAction(_ searchViewController: SearchViewController) {
         overlayNavigationController.popViewController(animated: true)
     }
-
+    
     // MARK: - Private
-
+    
     private func pushSearchViewController() {
         let search = SearchViewController(showsCloseAction: true)
         search.delegate = self
@@ -49,9 +49,9 @@ class ModalNavigationViewController: UIViewController, SearchViewControllerDeleg
 }
 
 extension ModalNavigationViewController: OverlayNavigationViewControllerDelegate {
-
+    
     // MARK: - OverlayNavigationViewControllerDelegate
-
+    
     func overlayNavigationViewController(_ navigationController: OverlayNavigationViewController,
                                          didShow viewController: UIViewController,
                                          animated: Bool) {
@@ -60,13 +60,13 @@ extension ModalNavigationViewController: OverlayNavigationViewControllerDelegate
 }
 
 extension ModalNavigationViewController: OverlayContainerViewControllerDelegate {
-
+    
     // MARK: - OverlayContainerViewControllerDelegate
-
+    
     func numberOfNotches(in containerViewController: OverlayContainerViewController) -> Int {
         return OverlayNotch.allCases.count
     }
-
+    
     func overlayContainerViewController(_ containerViewController: OverlayContainerViewController,
                                         heightForNotchAt index: Int,
                                         availableSpace: CGFloat) -> CGFloat {
@@ -77,7 +77,7 @@ extension ModalNavigationViewController: OverlayContainerViewControllerDelegate 
             return availableSpace * 1 / 4
         }
     }
-
+    
     func overlayContainerViewController(_ containerViewController: OverlayContainerViewController,
                                         shouldStartDraggingOverlay overlayViewController: UIViewController,
                                         at point: CGPoint,
@@ -88,44 +88,45 @@ extension ModalNavigationViewController: OverlayContainerViewControllerDelegate 
         let convertedPoint = coordinateSpace.convert(point, to: header)
         return header.bounds.contains(convertedPoint)
     }
-
+    
     func overlayPinnedViewConfig() -> OverlayPinnedViewConfig? {
         OverlayPinnedViewConfig(
             pinnedView: (overlayNavigationController.topViewController as? SearchViewController)?.button,
-//            constraintsMode: .set(
-//                insets: .init(top: 0, left: 16, bottom: 0, right: 16),
-//                edges: [.left, .right],
-//                height: 40
-//            ),
+            //            constraintsMode: .set(
+            //                insets: .init(top: 0, left: 16, bottom: 0, right: 16),
+            //                edges: [.left, .right],
+            //                height: 40
+            //            ),
             constraintsMode: .getExisting,
             safeAreaPolicy: .constrainAndHighlight(.white)
         )
     }
-
+    
     func overlayKeyboardPolicy() -> KeyboardPolicy? {
         .switchToLongFormWithPinndedView(-25)
     }
-
+    
     func overlayPreviewViewConfig() -> OverlayPreviewViewConfig? {
         guard let imageView = (overlayNavigationController.topViewController as? SearchViewController)?.imageView else {
             return nil
         }
-
+        
         let previewSizeOptions: [OverlayPreviewSizeOption] = [
             .fillByMinSide(multiply: 0.7, W_HAspect: 1)
         ]
-        return OverlayPreviewViewConfig(
-            previewView: .image(
-                sourceView: imageView,
-                url: nil
-            ),
-            previewSizeOption: previewSizeOptions,
-            previewTransitionOption: [
-                .viewToViewIn,
-                .viewToViewOut
-            ],
-            distanceToContainer: 50
-        )
+        return nil
+        //        return OverlayPreviewViewConfig(
+        //            previewView: .image(
+        //                sourceView: imageView,
+        //                url: nil
+        //            ),
+        //            previewSizeOption: previewSizeOptions,
+        //            previewTransitionOption: [
+        //                .viewToViewIn,
+        //                .viewToViewOut
+        //            ],
+        //            distanceToContainer: 50
+        //        )
     }
 }
 
