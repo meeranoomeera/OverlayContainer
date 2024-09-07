@@ -8,39 +8,55 @@
 import UIKit
 
 class ScrollViewOverlayTranslationDriver: OverlayTranslationDriver, OverlayScrollViewDelegate {
-
+    
     weak var translationController: OverlayTranslationController?
     weak var scrollView: UIScrollView?
-
+    
     private let scrollViewDelegateProxy = OverlayScrollViewDelegateProxy()
-
+    private var externalScrollViewDelegateProxy: ExternalOverlayScrollViewDelegate?
+    
     // (gz) 2018-11-27 The overlay transaction is not always equal to the scroll view translation.
     // The user can scroll bottom then drag the overlay up repeatedly in a single gesture.
     private var overlayTranslation: CGFloat = 0
     private var scrollViewTranslation: CGFloat = 0
     private var lastContentOffsetWhileScrolling: CGPoint = .zero
-
+    
     // MARK: - Life Cycle
-
-    init(translationController: OverlayTranslationController, scrollView: UIScrollView) {
+    
+    init(
+        translationController: OverlayTranslationController,
+        scrollView: UIScrollView
+    ) {
         self.translationController = translationController
         self.scrollView = scrollView
         scrollViewDelegateProxy.forward(to: self, delegateInvocationsFrom: scrollView)
         lastContentOffsetWhileScrolling = scrollView.contentOffset
     }
-
+    
+    init(
+        translationController: OverlayTranslationController,
+        scrollView: UIScrollView,
+        externalOverlayScrollViewDelegate: ExternalOverlayScrollViewDelegate
+    ) {
+        self.translationController = translationController
+        self.scrollView = scrollView
+        externalScrollViewDelegateProxy = externalOverlayScrollViewDelegate
+        externalScrollViewDelegateProxy?.delegate = self
+        lastContentOffsetWhileScrolling = scrollView.contentOffset
+    }
+    
     // MARK: - OverlayTranslationDriver
-
+    
     func clean() {
         scrollViewDelegateProxy.cancelForwarding()
     }
-
+    
     // MARK: - OverlayScrollViewDelegate
-
+    
     func overlayScrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         translationController?.startOverlayTranslation()
     }
-
+    
     func overlayScrollViewDidScroll(_ scrollView: UIScrollView) {
         guard let controller = translationController else { return }
         let previousTranslation = scrollViewTranslation
@@ -59,7 +75,7 @@ class ScrollViewOverlayTranslationDriver: OverlayTranslationDriver, OverlayScrol
             lastContentOffsetWhileScrolling = scrollView.contentOffset
         }
     }
-
+    
     func overlayScrollView(_ scrollView: UIScrollView,
                            willEndDraggingwithVelocity velocity: CGPoint,
                            targetContentOffset: UnsafeMutablePointer<CGPoint>) {
@@ -91,9 +107,9 @@ class ScrollViewOverlayTranslationDriver: OverlayTranslationDriver, OverlayScrol
         }
         controller.endOverlayTranslation(withVelocity: adjustedVelocity)
     }
-
+    
     // MARK: - Private
-
+    
     private func shouldDragOverlay(following scrollView: UIScrollView) -> Bool {
         guard let controller = translationController, scrollView.isTracking else { return false }
         let velocity = scrollView.panGestureRecognizer.velocity(in: nil).y
@@ -109,7 +125,7 @@ class ScrollViewOverlayTranslationDriver: OverlayTranslationDriver, OverlayScrol
             return false
         }
     }
-
+    
     private func adjustedContentOffset(dragging scrollView: UIScrollView) -> CGPoint {
         guard let controller = translationController else { return .zero }
         var contentOffset = lastContentOffsetWhileScrolling

@@ -12,51 +12,53 @@ public extension OverlayContainerViewControllerDelegate {
                                         transitioningDelegateForOverlay overlayViewController: UIViewController) -> OverlayTransitioningDelegate? {
         return nil
     }
-
+    
     func overlayContainerViewController(_ containerViewController: OverlayContainerViewController,
                                         scrollViewDrivingOverlay overlayViewController: UIViewController) -> UIScrollView? {
         return nil
     }
-
+    
     func overlayContainerViewController(_ containerViewController: OverlayContainerViewController,
                                         shouldStartDraggingOverlay overlayViewController: UIViewController,
                                         at point: CGPoint,
                                         in coordinateSpace: UICoordinateSpace) -> Bool {
-		return containerViewController.overlayTranslationView.frame.contains(point)
+        return containerViewController.overlayTranslationView.frame.contains(point)
     }
-
+    
     func overlayContainerViewController(_ containerViewController: OverlayContainerViewController,
                                         overlayTranslationFunctionForOverlay overlayViewController: UIViewController) -> OverlayTranslationFunction? {
         return nil
     }
-
+    
     func overlayContainerViewController(_ containerViewController: OverlayContainerViewController,
                                         willMoveOverlay overlayViewController: UIViewController,
                                         toNotchAt index: Int) {}
-
+    
     func overlayContainerViewController(_ containerViewController: OverlayContainerViewController,
                                         didMoveOverlay overlayViewController: UIViewController,
                                         toNotchAt index: Int) {}
-
+    
     func overlayContainerViewController(_ containerViewController: OverlayContainerViewController,
                                         willStartDraggingOverlay overlayViewController: UIViewController) {}
-
+    
     func overlayContainerViewController(_ containerViewController: OverlayContainerViewController,
                                         willEndDraggingOverlay overlayViewController: UIViewController,
                                         atVelocity velocity: CGPoint) {}
-
+    
     func overlayContainerViewController(_ containerViewController: OverlayContainerViewController,
                                         willTranslateOverlay overlayViewController: UIViewController,
                                         transitionCoordinator: OverlayContainerTransitionCoordinator) {}
-
+    
     func overlayContainerViewController(_ containerViewController: OverlayContainerViewController,
                                         canReachNotchAt index: Int,
                                         forOverlay overlayViewController: UIViewController) -> Bool {
         return true
     }
-
+    
     func overlayPinnedViewConfig() -> OverlayPinnedViewConfig? { nil }
     func overlayKeyboardPolicy() -> KeyboardPolicy? { nil }
+    func overlayContainerShouldBeginDragging() -> Bool { true }
+    func overlayContainerShouldRecognizeSimultaneously() -> Bool { false }
     func overlayPreviewViewConfig() -> OverlayPreviewViewConfig? { nil }
     func overlayDidDisplayPreview(view: UIView?) {  }
 }

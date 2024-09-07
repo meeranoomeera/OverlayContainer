@@ -9,7 +9,7 @@ import UIKit
 
 /// The container delegate is responsible for defining the aspect and the behavior of the container.
 public protocol OverlayContainerViewControllerDelegate: AnyObject {
-
+    
     /// Asks the delegate for the number of notches in the container.
     /// **Required**.
     ///
@@ -17,25 +17,25 @@ public protocol OverlayContainerViewControllerDelegate: AnyObject {
     ///
     /// - returns: The number of notches in `containerViewController`.
     func numberOfNotches(in containerViewController: OverlayContainerViewController) -> Int
-
+    
     /// Asks the delegate for the Pinned View, pinned to bootom and its config
     /// **Required**.
     ///
     /// - returns: OverlayPinnedViewConfig.
     func overlayPinnedViewConfig() -> OverlayPinnedViewConfig?
-
+    
     func overlayPreviewViewConfig() -> OverlayPreviewViewConfig?
-
+    
     /// Notifies the delegate after the pan modal preview is displayed .
     /// Default value is an empty implementation.
     func overlayDidDisplayPreview(view: UIView?)
-
+    
     /// Asks the delegate for the KeyboardPolicy
     /// **Required**.
     ///
     /// - returns: KeyboardPolicy.
     func overlayKeyboardPolicy() -> KeyboardPolicy?
-
+    
     /// Asks the delegate for the height of a notch in a specified location.
     /// **Required**.
     ///
@@ -50,7 +50,7 @@ public protocol OverlayContainerViewControllerDelegate: AnyObject {
     func overlayContainerViewController(_ containerViewController: OverlayContainerViewController,
                                         heightForNotchAt index: Int,
                                         availableSpace: CGFloat) -> CGFloat
-
+    
     /// Asks the delegate for a scroll view driving the overlay view controller translation.
     ///
     /// The container view controller can coordinate the scrolling of a scroll view
@@ -63,7 +63,7 @@ public protocol OverlayContainerViewControllerDelegate: AnyObject {
     /// - returns: A scroll view to use as a translation driver.
     func overlayContainerViewController(_ containerViewController: OverlayContainerViewController,
                                         scrollViewDrivingOverlay overlayViewController: UIViewController) -> UIScrollView?
-
+    
     /// Asks the delegate if the container should drag the overlay view controller
     /// when the user starts a pan gesture at the specified location.
     ///
@@ -82,14 +82,14 @@ public protocol OverlayContainerViewControllerDelegate: AnyObject {
                                         shouldStartDraggingOverlay overlayViewController: UIViewController,
                                         at point: CGPoint,
                                         in coordinateSpace: UICoordinateSpace) -> Bool
-
+    
     /// Tells the delegate when the user is about to start dragging the overlay view controller.
     ///
     /// - parameter containerViewController: The container requesting this information.
     /// - parameter overlayViewController: The overlay view controller.
     func overlayContainerViewController(_ containerViewController: OverlayContainerViewController,
                                         willStartDraggingOverlay overlayViewController: UIViewController)
-
+    
     /// Tells the delegate when the user finishs dragging the overlay view controller with the specified velocity.
     ///
     /// - parameter containerViewController: The container requesting this information.
@@ -98,7 +98,7 @@ public protocol OverlayContainerViewControllerDelegate: AnyObject {
     func overlayContainerViewController(_ containerViewController: OverlayContainerViewController,
                                         willEndDraggingOverlay overlayViewController: UIViewController,
                                         atVelocity velocity: CGPoint)
-
+    
     /// Tells the delegate when the container is about to move the overlay view controller to the specified notch.
     ///
     /// In some cases, the overlay view controller may not successfully reach the specified notch.
@@ -111,7 +111,7 @@ public protocol OverlayContainerViewControllerDelegate: AnyObject {
     func overlayContainerViewController(_ containerViewController: OverlayContainerViewController,
                                         willMoveOverlay overlayViewController: UIViewController,
                                         toNotchAt index: Int)
-
+    
     /// Tells the delegate when the container has moved the overlay view controller to the specified notch.
     ///
     /// - parameter containerViewController: The container requesting this information.
@@ -120,7 +120,7 @@ public protocol OverlayContainerViewControllerDelegate: AnyObject {
     func overlayContainerViewController(_ containerViewController: OverlayContainerViewController,
                                         didMoveOverlay overlayViewController: UIViewController,
                                         toNotchAt index: Int)
-
+    
     /// Tells the delegate whenever the overlay view controller is about to be translated.
     ///
     /// The delegate typically implements this method to coordinate changes alongside
@@ -139,7 +139,7 @@ public protocol OverlayContainerViewControllerDelegate: AnyObject {
     func overlayContainerViewController(_ containerViewController: OverlayContainerViewController,
                                         willTranslateOverlay overlayViewController: UIViewController,
                                         transitionCoordinator: OverlayContainerTransitionCoordinator)
-
+    
     /// Asks the delegate for a translation function when dragging the specified view controller.
     ///
     /// The function is only used for translation based on the container pan gesture recognizer.
@@ -150,7 +150,7 @@ public protocol OverlayContainerViewControllerDelegate: AnyObject {
     /// - returns: A overlay translation function.
     func overlayContainerViewController(_ containerViewController: OverlayContainerViewController,
                                         overlayTranslationFunctionForOverlay overlayViewController: UIViewController) -> OverlayTranslationFunction?
-
+    
     /// Asks the delegate for an object providing the translation end animator.
     ///
     /// - parameter containerViewController: The container requesting this information.
@@ -159,7 +159,7 @@ public protocol OverlayContainerViewControllerDelegate: AnyObject {
     /// - returns: A object implementing the `OverlayTransitioningDelegate` protocol.
     func overlayContainerViewController(_ containerViewController: OverlayContainerViewController,
                                         transitioningDelegateForOverlay overlayViewController: UIViewController) -> OverlayTransitioningDelegate?
-
+    
     /// Asks the delegate if the container can reach the specified notch.
     ///
     /// - parameter containerViewController: The container requesting this information.
@@ -170,4 +170,7 @@ public protocol OverlayContainerViewControllerDelegate: AnyObject {
     func overlayContainerViewController(_ containerViewController: OverlayContainerViewController,
                                         canReachNotchAt index: Int,
                                         forOverlay overlayViewController: UIViewController) -> Bool
+    
+    func overlayContainerShouldBeginDragging() -> Bool
+    func overlayContainerShouldRecognizeSimultaneously() -> Bool
 }
