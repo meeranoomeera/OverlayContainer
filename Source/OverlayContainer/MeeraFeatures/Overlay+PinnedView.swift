@@ -31,7 +31,7 @@ extension OverlayContainerViewController {
         self.meera_pinnedViewContainer = pinnedViewContainer
 
         switch pinnedViewConfig.safeAreaPolicy {
-        case .ignore:
+        case .ignore, .fill:
             switch pinnedViewConfig.constraintsMode {
             case .set(let insets, let edges, let height, let width):
                 pinnedViewContainer.addSubview(_pinnedView)
@@ -56,7 +56,7 @@ extension OverlayContainerViewController {
                 }
             }
 
-        case .constrainAndHighlight(let color):
+        case .fillAndConstrain:
             switch pinnedViewConfig.constraintsMode {
             case .set(let insets, let edges, let height, let width):
                 pinnedViewContainer.addSubview(_pinnedView)
@@ -85,17 +85,14 @@ extension OverlayContainerViewController {
                 }
             }
 
-            let safeAreaView = SafeAreaBottomView()
-            safeAreaView.backgroundColor = color
-            pinnedViewContainer.addSubview(safeAreaView)
+        }
 
-            safeAreaView.translatesAutoresizingMaskIntoConstraints = false
-            safeAreaView.pinToSuperview(edges: [.left, .right, .bottom])
-
-            // задержка чтобы получить значение safe area
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-                safeAreaView.heightAnchor.constraint(equalToConstant: self?.view.safeAreaInsets.bottom ?? 0).isActive = true
-            }
+        switch pinnedViewConfig.safeAreaPolicy {
+        case .fill(let color), .fillAndConstrain(let color):
+            meera_addSafeAreaView(to: pinnedViewContainer, color: color)
+            meera_addSafeAreaView(to: pinnedViewContainer, color: color)
+        case .ignore:
+            break
         }
     }
 

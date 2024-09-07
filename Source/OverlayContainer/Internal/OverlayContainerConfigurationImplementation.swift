@@ -58,6 +58,10 @@ class OverlayContainerConfigurationImplementation: OverlayContainerConfiguration
         return delegate?.overlayPreviewViewConfig()
     }
 
+    func overlayBottomSafeAreaPolicy() -> SafeAreaPolicy {
+        return delegate?.overlayBottomSafeAreaPolicy() ?? .ignore
+    }
+
     func overlayDidDisplayPreview(view: UIView?) {
         delegate?.overlayDidDisplayPreview(view: view)
     }

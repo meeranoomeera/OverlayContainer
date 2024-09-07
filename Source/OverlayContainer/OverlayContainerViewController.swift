@@ -143,10 +143,11 @@ open class OverlayContainerViewController: UIViewController {
     
     private let dashViewStyle: DashViewStyle
     
-    private var navControllerTopConstraint: NSLayoutConstraint?
-    private var leftInsetConstraint: NSLayoutConstraint?
-    private var rightInsetConstraint: NSLayoutConstraint?
-    private var topInsetValue: CGFloat = .zero
+    internal var meera_topConstraint: NSLayoutConstraint?
+    internal var meera_bottomConstraint: NSLayoutConstraint?
+    internal var leftInsetConstraint: NSLayoutConstraint?
+    internal var rightInsetConstraint: NSLayoutConstraint?
+    internal var topInsetValue: CGFloat = .zero
     
     public var statusBarHeight: CGFloat {
         let window = UIApplication.shared.windows.first
@@ -187,7 +188,7 @@ open class OverlayContainerViewController: UIViewController {
         loadContainerViews()
         loadOverlayViews()
     }
-    
+
     open override func viewDidLoad() {
         super.viewDidLoad()
         meera_loadOverlayPinnedView()
@@ -248,9 +249,9 @@ open class OverlayContainerViewController: UIViewController {
     
     public func setTopInset(_ value: CGFloat, animated: Bool) {
         topInsetValue = value
-        navControllerTopConstraint?.constant = value
-        navControllerTopConstraint?.isActive = true
-        
+        meera_topConstraint?.constant = value
+			meera_topConstraint?.isActive = true
+
         if animated {
             baseAnimation {
                 self.dashView.frame.size.height = value + 1
@@ -378,12 +379,12 @@ open class OverlayContainerViewController: UIViewController {
         
         overlayContainerView.pinToSuperview(edges: [.left, .right])
         
-        navControllerTopConstraint = overlayTranslationView.topAnchor.constraint(
+			meera_topConstraint = overlayTranslationView.topAnchor.constraint(
             equalTo: overlayContainerView.topAnchor,
             constant: topInsetValue
         )
         
-        navControllerTopConstraint?.isActive = true
+			meera_topConstraint?.isActive = true
         
         overlayContainerView.clipsToBounds = true
         overlayContainerView.layer.cornerRadius = cornerRadius
@@ -430,10 +431,31 @@ open class OverlayContainerViewController: UIViewController {
         groundView.isHidden = viewControllers.count == 1
         var truncatedViewControllers = viewControllers
         truncatedViewControllers.popLast().flatMap {
-            navControllerTopConstraint = $0.view.topAnchor.constraint(
+            meera_topConstraint = $0.view.topAnchor.constraint(
                 equalTo: overlayContainerView.topAnchor,
                 constant: dashViewHeight
             )
+
+            switch configuration.overlayBottomSafeAreaPolicy() {
+            case .ignore:
+                meera_bottomConstraint = $0.view.bottomAnchor.constraint(
+                    equalTo: overlayContainerView.bottomAnchor,
+                    constant: 0
+                )
+            case .fill(let color):
+                meera_bottomConstraint = $0.view.bottomAnchor.constraint(
+                    equalTo: overlayContainerView.bottomAnchor,
+                    constant: 0
+                )
+                meera_addSafeAreaView(to: overlayContainerView, color: color)
+            case .fillAndConstrain(let color):
+                meera_bottomConstraint = $0.view.bottomAnchor.constraint(
+                    equalTo: overlayContainerView.safeAreaLayoutGuide.bottomAnchor,
+                    constant: 0
+                )
+                meera_addSafeAreaView(to: overlayContainerView, color: color)
+            }
+
             addChild($0)
             overlayContainerView.addSubview($0.view)
             $0.view.translatesAutoresizingMaskIntoConstraints = false
@@ -445,15 +467,18 @@ open class OverlayContainerViewController: UIViewController {
                 $0.view.trailingAnchor.constraint(
                     equalTo: overlayContainerView.trailingAnchor
                 ),
-                $0.view.bottomAnchor.constraint(
+                meera_bottomConstraint ?? $0.view.bottomAnchor.constraint(
                     equalTo: overlayContainerView.bottomAnchor
                 ),
-                navControllerTopConstraint ?? $0.view.topAnchor.constraint(
+                meera_topConstraint ?? $0.view.topAnchor.constraint(
                     equalTo: overlayContainerView.topAnchor
                 )
             ])
             $0.didMove(toParent: self)
         }
+        meera_topConstraint?.isActive = true
+        meera_bottomConstraint?.isActive = true
+
         truncatedViewControllers.forEach { addChild($0, in: groundView) }
         loadTranslationDrivers()
     }

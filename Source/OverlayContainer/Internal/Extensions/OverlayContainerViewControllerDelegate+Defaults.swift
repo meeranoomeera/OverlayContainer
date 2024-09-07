@@ -58,5 +58,6 @@ public extension OverlayContainerViewControllerDelegate {
     func overlayPinnedViewConfig() -> OverlayPinnedViewConfig? { nil }
     func overlayKeyboardPolicy() -> KeyboardPolicy? { nil }
     func overlayPreviewViewConfig() -> OverlayPreviewViewConfig? { nil }
+    func overlayBottomSafeAreaPolicy() -> SafeAreaPolicy { .ignore }
     func overlayDidDisplayPreview(view: UIView?) {  }
 }

@@ -205,7 +205,7 @@ extension OverlayContainerViewController {
         }
         
         baseAnimation(
-            animations: { [weak self] in
+            animations: { [weak self, weak snapshot] in
                 if case .loadable = _previewItem {
                     snapshot?.alpha = 0
                 } else if ((previewViewConfig.previewTransitionOption?.contains(.fadeIn)) != nil) {
@@ -223,7 +223,7 @@ extension OverlayContainerViewController {
                     snapshot?.contentMode = toPreviewView.contentMode
                     snapshot?.layoutIfNeeded()
                 }
-            }, completion: { [weak self] uiViewAnimatingPosition in
+            }, completion: { [weak self, weak snapshot, weak toPreviewView] uiViewAnimatingPosition in
                 snapshot?.removeFromSuperview()
                 toPreviewView?.isHidden = false
                 self?.configuration.overlayDidDisplayPreview(view: toPreviewView)
@@ -254,7 +254,7 @@ extension OverlayContainerViewController {
         
         
         baseAnimation(
-            animations: { [weak self] in
+            animations: { [weak self, weak snapshot, weak toPreviewView] in
                 guard let toPreviewView else {
                     return
                 }
@@ -274,8 +274,9 @@ extension OverlayContainerViewController {
                     snapshot?.layer.cornerRadius = previewViewConfig.cornerRadius
                 }
                 snapshot?.layoutIfNeeded()
-            }, completion: { [weak snapshot] uiViewAnimatingPosition in
+            }, completion: { [weak self, weak snapshot] uiViewAnimatingPosition in
                 snapshot?.removeFromSuperview()
+                self?.meera_previewContainer?.removeFromSuperview()
             }
         )
         if ((previewViewConfig.previewTransitionOption?.contains(.fadeOut)) != nil) {

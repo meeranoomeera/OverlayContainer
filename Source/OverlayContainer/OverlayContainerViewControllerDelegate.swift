@@ -26,6 +26,8 @@ public protocol OverlayContainerViewControllerDelegate: AnyObject {
 
     func overlayPreviewViewConfig() -> OverlayPreviewViewConfig?
 
+    func overlayBottomSafeAreaPolicy() -> SafeAreaPolicy
+
     /// Notifies the delegate after the pan modal preview is displayed .
     /// Default value is an empty implementation.
     func overlayDidDisplayPreview(view: UIView?)
