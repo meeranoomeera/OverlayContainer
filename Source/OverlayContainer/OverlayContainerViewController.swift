@@ -431,10 +431,19 @@ open class OverlayContainerViewController: UIViewController {
         var drivers: [OverlayTranslationDriver] = []
         let panGestureDriver = PanGestureOverlayTranslationDriver(
             translationController: translationController,
-            panGestureRecognizer: overlayPanGesture,
-			shouldBeginCondition: delegate?.overlayContainerShouldBeginDragging,
-			shouldRecognizeSimultaneously: delegate?.overlayContainerShouldRecognizeSimultaneously
+            panGestureRecognizer: overlayPanGesture
         )
+		panGestureDriver.shouldBeginCondition = { [weak self] in
+			self?.delegate?.overlayContainerShouldBeginDragging != nil
+			? self?.delegate?.overlayContainerShouldBeginDragging() == true
+			: false
+		}
+		panGestureDriver.shouldRecognizeSimultaneously = { [weak self] in
+			self?.delegate?.overlayContainerShouldRecognizeSimultaneously != nil
+			? self?.delegate?.overlayContainerShouldRecognizeSimultaneously() == true
+			: false
+		}
+		
         drivers.append(panGestureDriver)
         let scrollView = drivingScrollView ?? configuration.scrollView(drivingOverlay: overlayController)
 
