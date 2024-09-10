@@ -13,8 +13,8 @@ extension OverlayContainerViewController {
 		contentMaxHeightConstraint?.isActive = true
 		
 		if animated {
-			baseAnimation {
-				self.overlayContainerView.layoutIfNeeded()
+			baseAnimation { [weak self] in
+				self?.overlayContainerView.layoutIfNeeded()
 			}
 		}
 	}
@@ -60,9 +60,9 @@ extension OverlayContainerViewController {
 		navControllerTopConstraint?.isActive = true
 		
 		if animated {
-			baseAnimation {
-				self.dashView.frame.size.height = value + 1
-				self.overlayTranslationView.layoutIfNeeded()
+			baseAnimation { [weak self] in
+				self?.dashView.frame.size.height = value + 1
+				self?.overlayTranslationView.layoutIfNeeded()
 			}
 		} else {
 			dashView.frame.size.height = value + 1

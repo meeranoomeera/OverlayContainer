@@ -11,23 +11,21 @@ class PanGestureOverlayTranslationDriver: NSObject,
                                           OverlayTranslationDriver,
                                           UIGestureRecognizerDelegate {
 
-    private weak var translationController: OverlayTranslationController?
     private let panGestureRecognizer: OverlayTranslationGestureRecognizer
-	private var shouldBeginCondition: (() -> Bool)?
-	private var shouldRecognizeSimultaneously: (() -> Bool)?
+
+	public var shouldBeginCondition: (() -> Bool)?
+	public var shouldRecognizeSimultaneously: (() -> Bool)?
+	
+	private weak var translationController: OverlayTranslationController?
 
     // MARK: - Life Cycle
 
 	init(
 		translationController: OverlayTranslationController,
-		panGestureRecognizer: OverlayTranslationGestureRecognizer,
-		shouldBeginCondition: (() -> Bool)?,
-		shouldRecognizeSimultaneously: (() -> Bool)?
+		panGestureRecognizer: OverlayTranslationGestureRecognizer
 	) {
         self.translationController = translationController
         self.panGestureRecognizer = panGestureRecognizer
-		self.shouldBeginCondition = shouldBeginCondition
-		self.shouldRecognizeSimultaneously = shouldRecognizeSimultaneously
         super.init()
         panGestureRecognizer.delegate = self
         panGestureRecognizer.addTarget(self, action: #selector(overlayPanGestureAction(_:)))
