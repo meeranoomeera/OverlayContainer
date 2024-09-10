@@ -331,10 +331,6 @@ open class OverlayContainerViewController: UIViewController {
             overlayContainerWrappedView.addSubview(dashView)
         }
 
-        if dashViewStyle == .default {
-            overlayContainerView.addSubview(dashView)
-        }
-
         overlayTranslationView.pinToSuperview(edges: [.bottom])
 
         leftInsetConstraint = overlayTranslationContainerView.leadingAnchor.constraint(
@@ -412,13 +408,13 @@ open class OverlayContainerViewController: UIViewController {
                     equalTo: overlayContainerView.bottomAnchor,
                     constant: 0
                 )
-                meera_addSafeAreaView(to: overlayContainerView, color: color)
+                meera_addSafeAreaView(to: overlayContainerWrappedView, color: color)
             case .fillAndConstrain(let color):
                 meera_bottomConstraint = $0.view.bottomAnchor.constraint(
                     equalTo: overlayContainerView.safeAreaLayoutGuide.bottomAnchor,
                     constant: 0
                 )
-                meera_addSafeAreaView(to: overlayContainerView, color: color)
+                meera_addSafeAreaView(to: overlayContainerWrappedView, color: color)
             }
 
             addChild($0)
@@ -433,7 +429,7 @@ open class OverlayContainerViewController: UIViewController {
                     equalTo: overlayContainerWrappedView.trailingAnchor
                 ),
                 meera_bottomConstraint ?? $0.view.bottomAnchor.constraint(
-                    equalTo: overlayContainerView.bottomAnchor
+                    equalTo: overlayContainerWrappedView.bottomAnchor
                 ),
                 meera_topConstraint ?? $0.view.topAnchor.constraint(
                     equalTo: overlayContainerView.topAnchor
