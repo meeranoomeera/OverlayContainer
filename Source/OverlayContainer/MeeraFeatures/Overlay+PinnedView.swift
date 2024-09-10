@@ -90,7 +90,6 @@ extension OverlayContainerViewController {
         switch pinnedViewConfig.safeAreaPolicy {
         case .fill(let color), .fillAndConstrain(let color):
             meera_addSafeAreaView(to: pinnedViewContainer, color: color)
-            meera_addSafeAreaView(to: pinnedViewContainer, color: color)
         case .ignore:
             break
         }

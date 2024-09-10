@@ -408,13 +408,13 @@ open class OverlayContainerViewController: UIViewController {
                     equalTo: overlayContainerView.bottomAnchor,
                     constant: 0
                 )
-                meera_addSafeAreaView(to: overlayContainerWrappedView, color: color)
+                meera_addSafeAreaView(to: overlayContainerView, color: color)
             case .fillAndConstrain(let color):
                 meera_bottomConstraint = $0.view.bottomAnchor.constraint(
                     equalTo: overlayContainerView.safeAreaLayoutGuide.bottomAnchor,
                     constant: 0
                 )
-                meera_addSafeAreaView(to: overlayContainerWrappedView, color: color)
+                meera_addSafeAreaView(to: overlayContainerView, color: color)
             }
 
             addChild($0)
@@ -429,7 +429,7 @@ open class OverlayContainerViewController: UIViewController {
                     equalTo: overlayContainerWrappedView.trailingAnchor
                 ),
                 meera_bottomConstraint ?? $0.view.bottomAnchor.constraint(
-                    equalTo: overlayContainerWrappedView.bottomAnchor
+                    equalTo: overlayContainerView.bottomAnchor
                 ),
                 meera_topConstraint ?? $0.view.topAnchor.constraint(
                     equalTo: overlayContainerView.topAnchor
