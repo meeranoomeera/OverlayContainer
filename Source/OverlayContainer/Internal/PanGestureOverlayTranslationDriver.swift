@@ -11,13 +11,19 @@ class PanGestureOverlayTranslationDriver: NSObject,
                                           OverlayTranslationDriver,
                                           UIGestureRecognizerDelegate {
 
-    private weak var translationController: OverlayTranslationController?
     private let panGestureRecognizer: OverlayTranslationGestureRecognizer
+
+    public var shouldBeginCondition: (() -> Bool)?
+    public var shouldRecognizeSimultaneously: (() -> Bool)?
+
+    private weak var translationController: OverlayTranslationController?
 
     // MARK: - Life Cycle
 
-    init(translationController: OverlayTranslationController,
-         panGestureRecognizer: OverlayTranslationGestureRecognizer) {
+    init(
+        translationController: OverlayTranslationController,
+        panGestureRecognizer: OverlayTranslationGestureRecognizer
+    ) {
         self.translationController = translationController
         self.panGestureRecognizer = panGestureRecognizer
         super.init()
@@ -38,7 +44,9 @@ class PanGestureOverlayTranslationDriver: NSObject,
               let gesture = gestureRecognizer as? OverlayTranslationGestureRecognizer else {
             return false
         }
-        return translationController?.isDraggable(at: gesture.startingLocation, in: view) ?? false
+        let isDraggable = translationController?.isDraggable(at: gesture.startingLocation, in: view) ?? false
+
+        return isDraggable && shouldBeginCondition?() == true
     }
 
     // MARK: - Action
@@ -64,5 +72,12 @@ class PanGestureOverlayTranslationDriver: NSObject,
         @unknown default:
             break
         }
+    }
+
+    func gestureRecognizer(
+        _ gestureRecognizer: UIGestureRecognizer,
+        shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
+    ) -> Bool {
+        shouldRecognizeSimultaneously?() == true
     }
 }
