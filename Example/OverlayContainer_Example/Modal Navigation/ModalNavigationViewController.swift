@@ -92,18 +92,41 @@ extension ModalNavigationViewController: OverlayContainerViewControllerDelegate 
     func overlayPinnedViewConfig() -> OverlayPinnedViewConfig? {
         OverlayPinnedViewConfig(
             pinnedView: (overlayNavigationController.topViewController as? SearchViewController)?.button,
-//            constraintsMode: .set(
-//                insets: .init(top: 0, left: 16, bottom: 0, right: 16),
-//                edges: [.left, .right],
-//                height: 40
-//            ),
+            //            constraintsMode: .set(
+            //                insets: .init(top: 0, left: 16, bottom: 0, right: 16),
+            //                edges: [.left, .right],
+            //                height: 40
+            //            ),
             constraintsMode: .getExisting,
-            safeAreaPolicy: .constrainAndHighlight(.white)
+            safeAreaPolicy: .fillAndConstrain(.white)
         )
     }
 
     func overlayKeyboardPolicy() -> KeyboardPolicy? {
         .switchToLongFormWithPinndedView(-25)
+    }
+
+    func overlayPreviewViewConfig() -> OverlayPreviewViewConfig? {
+        guard let imageView = (overlayNavigationController.topViewController as? SearchViewController)?.imageView else {
+            return nil
+        }
+
+        let previewSizeOptions: [OverlayPreviewSizeOption] = [
+            .fillByMinSide(multiply: 0.7, W_HAspect: 1)
+        ]
+        return nil
+        //        return OverlayPreviewViewConfig(
+        //            previewView: .image(
+        //                sourceView: imageView,
+        //                url: nil
+        //            ),
+        //            previewSizeOption: previewSizeOptions,
+        //            previewTransitionOption: [
+        //                .viewToViewIn,
+        //                .viewToViewOut
+        //            ],
+        //            distanceToContainer: 50
+        //        )
     }
 }
 

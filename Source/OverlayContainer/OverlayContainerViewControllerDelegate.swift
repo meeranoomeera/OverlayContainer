@@ -24,6 +24,14 @@ public protocol OverlayContainerViewControllerDelegate: AnyObject {
     /// - returns: OverlayPinnedViewConfig.
     func overlayPinnedViewConfig() -> OverlayPinnedViewConfig?
 
+    func overlayPreviewViewConfig() -> OverlayPreviewViewConfig?
+
+    func overlayBottomSafeAreaPolicy() -> SafeAreaPolicy
+
+    /// Notifies the delegate after the preview is displayed .
+    /// Default value is an empty implementation.
+    func overlayDidDisplayPreview(view: UIView?)
+
     /// Asks the delegate for the KeyboardPolicy
     /// **Required**.
     ///
@@ -164,7 +172,7 @@ public protocol OverlayContainerViewControllerDelegate: AnyObject {
     func overlayContainerViewController(_ containerViewController: OverlayContainerViewController,
                                         canReachNotchAt index: Int,
                                         forOverlay overlayViewController: UIViewController) -> Bool
-	
-	func overlayContainerShouldBeginDragging() -> Bool
-	func overlayContainerShouldRecognizeSimultaneously() -> Bool
+
+    func overlayContainerShouldBeginDragging() -> Bool
+    func overlayContainerShouldRecognizeSimultaneously() -> Bool
 }

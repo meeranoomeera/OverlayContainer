@@ -11,7 +11,7 @@ public struct OverlayPinnedViewConfig {
         pinnedView: UIView?,
         constraintsMode: PinnedViewConstraintsMode = .getExisting,
         heightToStartMoveDown: CGFloat? = nil,
-        safeAreaPolicy: SafeAreaPolicy = .constrainAndHighlight(.white)
+        safeAreaPolicy: SafeAreaPolicy = .fillAndConstrain(.white)
     ) {
         self.pinnedView = pinnedView
         self.constraintsMode = constraintsMode

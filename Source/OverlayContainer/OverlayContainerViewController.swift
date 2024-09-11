@@ -29,11 +29,6 @@ open class OverlayContainerViewController: UIViewController {
         /// Its height will be expanded if the overlay goes beyond the highest notch.
         case expandableHeight
     }
-	
-	public enum DashViewStyle {
-		case none
-		case `default`
-	}
 
     /// The delegate of the container.
     weak open var delegate: OverlayContainerViewControllerDelegate? {
@@ -46,10 +41,10 @@ open class OverlayContainerViewController: UIViewController {
             return configuration.delegate
         }
     }
-	
-	open var maximumHeight: CGFloat? {
-		nil
-	}
+
+    open var maximumHeight: CGFloat? {
+        nil
+    }
 
     /// The view controllers displayed.
     open var viewControllers: [UIViewController] = [] {
@@ -84,48 +79,43 @@ open class OverlayContainerViewController: UIViewController {
     open var availableSpace: CGFloat {
         return view.frame.height
     }
-	
-	public var lastNotchIndex: Int? {
-		translationController?.lastTranslationEndNotchIndex
-	}
+
+    public var lastNotchIndex: Int? {
+        translationController?.lastTranslationEndNotchIndex
+    }
 
     /// The style of the container.
     public let style: OverlayStyle
 
     internal lazy var kbObserver: KeyboardObserverInterface = KeyboardObserver()
-    internal var pinnedView: PassThroughView?
+    internal var meera_pinnedViewContainer: PassThroughView?
+    internal var meera_previewContainer: PassThroughView?
 
     private lazy var overlayPanGesture: OverlayTranslationGestureRecognizer = self.makePanGesture()
     internal lazy var overlayContainerView = OverlayContainerView()
     internal lazy var overlayTranslationView = OverlayTranslationView()
     internal lazy var overlayTranslationContainerView = OverlayTranslationContainerView()
-	private lazy var overlayContainerWrappedView = OverlayContainerView()
+    private lazy var overlayContainerVisibleViewContainer = OverlayContainerView()
     private lazy var groundView = GroundView()
-	public private (set) lazy var dashView = DashView(
-		frame: CGRect(
-			x: 0,
-			y: 0,
-			width: UIScreen.main.bounds.width,
-			height: 20
+	public private (set) lazy var dashView = {
+		let dashView = DashView(
+			frame: CGRect(
+				x: 0, y: 0,
+				width: UIScreen.main.bounds.width, height: 20
+			)
 		)
-	)
+		dashView.updateStyle(to: dashViewStyle)
+		return dashView
+	}()
 
-    internal var pinnedViewBottomConstraint: NSLayoutConstraint? {
-        didSet {
-            debugPrint("pinnedViewBottomConstraint, \(pinnedViewBottomConstraint?.constant ?? 0)")
-        }
-    }
-    internal var finalBottomContraintValue: CGFloat = 0 {
-        didSet {
-            debugPrint("finalBottomContraintValue, \(finalBottomContraintValue)")
-        }
-    }
-    internal var keyboardHeight: CGFloat = 0
+    internal var meera_pinnedViewBottomConstraint: NSLayoutConstraint?
+    internal var meera_finalBottomContraintValue: CGFloat = 0
+    internal var meera_keyboardHeight: CGFloat = 0
     internal var overlayContainerViewStyleConstraint: NSLayoutConstraint?
     private var translationHeightConstraint: NSLayoutConstraint?
 
     internal lazy var configuration = makeConfiguration()
-	internal var externalScrollViewDelegate: ExternalOverlayScrollViewDelegate?
+    internal var externalScrollViewDelegate: ExternalOverlayScrollViewDelegate?
 
     private var needsOverlayContainerHeightUpdate = true
 
@@ -133,35 +123,27 @@ open class OverlayContainerViewController: UIViewController {
     private var translationController: HeightConstraintOverlayTranslationController?
     private var translationDrivers: [OverlayTranslationDriver] = []
 
-	public var overlayTranslation: OverlayTranslationController? {
-		translationController
-	}
+    public var overlayTranslation: OverlayTranslationController? {
+        translationController
+    }
 
-	open var cornerRadius: CGFloat {
-		0
-	}
-    
+    open var cornerRadius: CGFloat {
+        0
+    }
+
     open var needNavbarInset: Bool {
         false
     }
-    
-	private var dashViewHeight: CGFloat {
-		switch dashViewStyle {
-		case .default:
-			return 20
-		case .none:
-			return 0
-		}
-	}
 
-	private let dashViewStyle: DashViewStyle
-    
-    internal var navControllerTopConstraint: NSLayoutConstraint?
-	internal var leftInsetConstraint: NSLayoutConstraint?
-	internal var rightInsetConstraint: NSLayoutConstraint?
-	internal var contentMaxHeightConstraint: NSLayoutConstraint?
+    private let dashViewStyle: OverlayDashViewStyle
 
-	internal var topInsetValue: CGFloat = .zero
+    internal var meera_topConstraint: NSLayoutConstraint?
+    internal var meera_bottomConstraint: NSLayoutConstraint?
+    internal var leftInsetConstraint: NSLayoutConstraint?
+    internal var rightInsetConstraint: NSLayoutConstraint?
+    internal var contentMaxHeightConstraint: NSLayoutConstraint?
+
+    internal var topInsetValue: CGFloat = .zero
 
     public var statusBarHeight: CGFloat {
         let window = UIApplication.shared.windows.first
@@ -180,17 +162,17 @@ open class OverlayContainerViewController: UIViewController {
     ///
     /// - returns: The new `OverlayContainerViewController` instance.
     public init(
-		style: OverlayStyle = .expandableHeight,
-		dashViewStyle: DashViewStyle = .default
-	) {
+        style: OverlayStyle = .expandableHeight,
+				dashViewStyle: OverlayDashViewStyle = .default()
+    ) {
         self.style = style
-		self.dashViewStyle = dashViewStyle
+        self.dashViewStyle = dashViewStyle
         super.init(nibName: nil, bundle: nil)
     }
 
     public required init?(coder aDecoder: NSCoder) {
         self.style = .flexibleHeight
-		self.dashViewStyle = .default
+			self.dashViewStyle = .default()
         super.init(coder: aDecoder)
     }
 
@@ -205,9 +187,14 @@ open class OverlayContainerViewController: UIViewController {
 
     open override func viewDidLoad() {
         super.viewDidLoad()
-        loadOverlayPinnedView()
+        meera_loadOverlayPinnedView()
         setUpPanGesture()
-        setupKeyboardObserver()
+        meera_setupKeyboardObserver()
+    }
+
+    open override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        meera_loadOverlayPreviewView()
     }
 
     open override func viewWillLayoutSubviews() {
@@ -235,29 +222,32 @@ open class OverlayContainerViewController: UIViewController {
         configuration.requestOverlayMetricsIfNeeded()
         performDeferredTranslations()
     }
-	
-	public func setDragIndicatorHidden(_ isHidden: Bool) {
-		baseAnimation { [weak self] in
-			self?.dashView.dragIndicator.alpha = isHidden ? 0 : 1
-		}
-	}
-	
-	internal func baseAnimation(animations: @escaping () -> Void) {
-		let timing = UISpringTimingParameters(
-			mass: 1,
-			stiffness: pow(2 * .pi / 0.3, 2),
-			damping: 4 * .pi * 1 / 0.3,
-			initialVelocity: .zero
-		)
-		let animator = UIViewPropertyAnimator(
-			duration: 0,
-			timingParameters: timing
-		)
-		animator.addAnimations {
-			animations()
-		}
-		animator.startAnimation()
-	}
+
+    public func setDragIndicatorHidden(_ isHidden: Bool) {
+        baseAnimation { [weak self] in
+            self?.dashView.dragIndicator.alpha = isHidden ? 0 : 1
+        }
+    }
+
+    internal func baseAnimation(animations: @escaping () -> Void, completion: ((UIViewAnimatingPosition) -> Void)? = nil) {
+        let timing = UISpringTimingParameters(
+            mass: 1,
+            stiffness: pow(2 * .pi / 0.3, 2),
+            damping: 4 * .pi * 1 / 0.3,
+            initialVelocity: .zero
+        )
+        let animator = UIViewPropertyAnimator(
+            duration: 0,
+            timingParameters: timing
+        )
+        animator.addAnimations {
+            animations()
+        }
+        animator.addCompletion { uiViewAnimatingPosition in
+            completion?(uiViewAnimatingPosition)
+        }
+        animator.startAnimation()
+    }
 
     // MARK: - Internal
 
@@ -317,38 +307,42 @@ open class OverlayContainerViewController: UIViewController {
 
         overlayTranslationContainerView.addSubview(overlayTranslationView)
         overlayTranslationView.addSubview(overlayContainerView)
-		overlayContainerView.addSubview(overlayContainerWrappedView)
-		
-		overlayContainerView.pinToSuperview(edges: [.top, .left, .right])
-		overlayContainerWrappedView.pinToSuperview(edges: [.top, .left, .right])
-		
-		contentMaxHeightConstraint = overlayContainerWrappedView.heightAnchor.constraint(
-			equalToConstant: UIScreen.main.bounds.height + 100
-		)
-		
-		if dashViewStyle == .default {
-			overlayContainerWrappedView.addSubview(dashView)
-		}
-        
+        overlayContainerView.addSubview(overlayContainerVisibleViewContainer)
+
+        overlayContainerView.pinToSuperview(edges: [.top, .left, .right])
+        overlayContainerVisibleViewContainer.pinToSuperview(edges: [.top, .left, .right])
+
+        contentMaxHeightConstraint = overlayContainerVisibleViewContainer.heightAnchor.constraint(
+            equalToConstant: UIScreen.main.bounds.height + 100
+        )
+
+			switch dashViewStyle {
+			case .none:
+				break
+			case .default,
+					.overlay:
+				overlayContainerVisibleViewContainer.addSubview(dashView)
+			}
+
         overlayTranslationView.pinToSuperview(edges: [.bottom])
-		
-		leftInsetConstraint = overlayTranslationContainerView.leadingAnchor.constraint(
-			equalTo: overlayTranslationView.leadingAnchor,
-			constant: 0
-		)
 
-		rightInsetConstraint = overlayTranslationContainerView.trailingAnchor.constraint(
-			equalTo: overlayTranslationView.trailingAnchor,
-			constant: 0
-		)
+        leftInsetConstraint = overlayTranslationContainerView.leadingAnchor.constraint(
+            equalTo: overlayTranslationView.leadingAnchor,
+            constant: 0
+        )
 
-		leftInsetConstraint?.isActive = true
-		rightInsetConstraint?.isActive = true
-		contentMaxHeightConstraint?.isActive = true
-		
-		overlayContainerWrappedView.clipsToBounds = true
-		overlayContainerWrappedView.layer.cornerRadius = cornerRadius
-		
+        rightInsetConstraint = overlayTranslationContainerView.trailingAnchor.constraint(
+            equalTo: overlayTranslationView.trailingAnchor,
+            constant: 0
+        )
+
+        leftInsetConstraint?.isActive = true
+        rightInsetConstraint?.isActive = true
+        contentMaxHeightConstraint?.isActive = true
+
+        overlayContainerVisibleViewContainer.clipsToBounds = true
+        overlayContainerVisibleViewContainer.layer.cornerRadius = cornerRadius
+
         translationHeightConstraint = overlayTranslationView.heightAnchor.constraint(equalToConstant: 0)
         switch style {
         case .flexibleHeight:
@@ -391,40 +385,72 @@ open class OverlayContainerViewController: UIViewController {
         groundView.isHidden = viewControllers.count == 1
         var truncatedViewControllers = viewControllers
         truncatedViewControllers.popLast().flatMap {
-            navControllerTopConstraint = $0.view.topAnchor.constraint(
-                equalTo: overlayContainerWrappedView.topAnchor,
-                constant: dashViewHeight
-            )
+
+					switch dashViewStyle {
+					case .none:
+						break
+					case .default:
+						meera_topConstraint = $0.view.topAnchor.constraint(
+							equalTo: overlayContainerVisibleViewContainer.topAnchor,
+							constant: dashViewStyle.dashViewHeight
+						)
+					case .overlay:
+						meera_topConstraint = $0.view.topAnchor.constraint(
+							equalTo: overlayContainerVisibleViewContainer.topAnchor,
+							constant: 0
+						)
+					}
+
+            switch configuration.overlayBottomSafeAreaPolicy() {
+            case .ignore:
+                meera_bottomConstraint = $0.view.bottomAnchor.constraint(
+                    equalTo: overlayContainerView.bottomAnchor,
+                    constant: 0
+                )
+            case .fill(let color):
+                meera_bottomConstraint = $0.view.bottomAnchor.constraint(
+                    equalTo: overlayContainerView.bottomAnchor,
+                    constant: 0
+                )
+                meera_addSafeAreaView(to: overlayContainerView, color: color)
+            case .fillAndConstrain(let color):
+                meera_bottomConstraint = $0.view.bottomAnchor.constraint(
+                    equalTo: overlayContainerView.safeAreaLayoutGuide.bottomAnchor,
+                    constant: 0
+                )
+                meera_addSafeAreaView(to: overlayContainerView, color: color)
+            }
+
             addChild($0)
-			overlayContainerWrappedView.addSubview($0.view)
+            overlayContainerVisibleViewContainer.addSubview($0.view)
             $0.view.translatesAutoresizingMaskIntoConstraints = false
 
             NSLayoutConstraint.activate([
                 $0.view.leadingAnchor.constraint(
-                    equalTo: overlayContainerWrappedView.leadingAnchor
+                    equalTo: overlayContainerVisibleViewContainer.leadingAnchor
                 ),
-				$0.view.trailingAnchor.constraint(
-					equalTo: overlayContainerWrappedView.trailingAnchor
-				),
-                $0.view.bottomAnchor.constraint(
+                $0.view.trailingAnchor.constraint(
+                    equalTo: overlayContainerVisibleViewContainer.trailingAnchor
+                ),
+                meera_bottomConstraint ?? $0.view.bottomAnchor.constraint(
                     equalTo: overlayContainerView.bottomAnchor
                 ),
-                navControllerTopConstraint ?? $0.view.topAnchor.constraint(
-                    equalTo: overlayContainerWrappedView.topAnchor
+                meera_topConstraint ?? $0.view.topAnchor.constraint(
+                    equalTo: overlayContainerView.topAnchor
                 )
             ])
             $0.didMove(toParent: self)
         }
-		navControllerTopConstraint?.isActive = true
-
+        meera_topConstraint?.isActive = true
+        meera_bottomConstraint?.isActive = true
         truncatedViewControllers.forEach { addChild($0, in: groundView) }
         loadTranslationDrivers()
     }
 
     internal func loadTranslationDrivers() {
         guard let translationController = translationController,
-            let overlayController = topViewController else {
-                return
+              let overlayController = topViewController else {
+            return
         }
         translationDrivers.forEach { $0.clean() }
         translationDrivers.removeAll()
@@ -433,29 +459,29 @@ open class OverlayContainerViewController: UIViewController {
             translationController: translationController,
             panGestureRecognizer: overlayPanGesture
         )
-		panGestureDriver.shouldBeginCondition = { [weak self] in
-			self?.delegate?.overlayContainerShouldBeginDragging != nil
-			? self?.delegate?.overlayContainerShouldBeginDragging() == true
-			: false
-		}
-		panGestureDriver.shouldRecognizeSimultaneously = { [weak self] in
-			self?.delegate?.overlayContainerShouldRecognizeSimultaneously != nil
-			? self?.delegate?.overlayContainerShouldRecognizeSimultaneously() == true
-			: false
-		}
-		
+        panGestureDriver.shouldBeginCondition = { [weak self] in
+            self?.delegate?.overlayContainerShouldBeginDragging != nil
+            ? self?.delegate?.overlayContainerShouldBeginDragging() == true
+            : false
+        }
+        panGestureDriver.shouldRecognizeSimultaneously = { [weak self] in
+            self?.delegate?.overlayContainerShouldRecognizeSimultaneously != nil
+            ? self?.delegate?.overlayContainerShouldRecognizeSimultaneously() == true
+            : false
+        }
+
         drivers.append(panGestureDriver)
         let scrollView = drivingScrollView ?? configuration.scrollView(drivingOverlay: overlayController)
 
-		if let scrollView = scrollView, let externalScrollViewDelegate {
-			overlayPanGesture.drivingScrollView = scrollView
-			let driver = ScrollViewOverlayTranslationDriver(
-				translationController: translationController,
-				scrollView: scrollView,
-				externalOverlayScrollViewDelegate: externalScrollViewDelegate
-			)
-			drivers.append(driver)
-		} else if let scrollView = scrollView {
+        if let scrollView = scrollView, let externalScrollViewDelegate {
+            overlayPanGesture.drivingScrollView = scrollView
+            let driver = ScrollViewOverlayTranslationDriver(
+                translationController: translationController,
+                scrollView: scrollView,
+                externalOverlayScrollViewDelegate: externalScrollViewDelegate
+            )
+            drivers.append(driver)
+        } else if let scrollView = scrollView {
             overlayPanGesture.drivingScrollView = scrollView
             let driver = ScrollViewOverlayTranslationDriver(
                 translationController: translationController,
@@ -476,7 +502,7 @@ open class OverlayContainerViewController: UIViewController {
         case .flexibleHeight:
             overlayContainerViewStyleConstraint?.constant = 0
         case .rigid, .expandableHeight:
-			overlayContainerViewStyleConstraint?.constant = configuration.maximumNotchHeight
+            overlayContainerViewStyleConstraint?.constant = configuration.maximumNotchHeight
         }
         translationHeightConstraint?.isActive = true
         overlayContainerViewStyleConstraint?.isActive = true
@@ -531,12 +557,13 @@ extension OverlayContainerViewController: HeightConstraintOverlayTranslationCont
             toNotchAt: index
         )
 
-			hideKeyboardIfNeeded(forNotch: index)
-			// TODO: func
-			if configuration.heightForNotch(at: index) == 0 {
-				self.finalBottomContraintValue = self.translationHeightConstraint?.constant ?? -700
-				self.updatePinnedViewConstraints(nil)
-			}
+        meera_hideKeyboardIfNeeded(forNotch: index)
+        // TODO: func
+        if configuration.heightForNotch(at: index) == 0 {
+            self.meera_finalBottomContraintValue = self.translationHeightConstraint?.constant ?? -700
+            self.meera_updatePinnedViewConstraints(nil)
+            self.meera_animatePreviewOut()
+        }
     }
 
     func translationControllerWillStartDraggingOverlay(_ translationController: OverlayTranslationController) {
@@ -569,18 +596,18 @@ extension OverlayContainerViewController: HeightConstraintOverlayTranslationCont
     func translationController(_ translationController: OverlayTranslationController,
                                willTranslateOverlayWith transitionCoordinator: OverlayContainerTransitionCoordinator) {
         guard let controller = topViewController else { return }
-		
+
         if transitionCoordinator.isAnimated {
             overlayTranslationContainerView.layoutIfNeeded()
         }
         transitionCoordinator.animate(alongsideTransition: { [weak self] context in
             self?.updateOverlayContainerConstraints()
             if context is InterruptibleAnimatorOverlayContainerTransitionCoordinator {
-							if context.targetTranslationHeight != 0 {
-								self?.updatePinnedViewConstraints(nil)
-							}
+                if context.targetTranslationHeight != 0 {
+                    self?.meera_updatePinnedViewConstraints(nil)
+                }
             } else {
-                self?.updatePinnedViewConstraints(context)
+                self?.meera_updatePinnedViewConstraints(context)
             }
             self?.overlayTranslationContainerView.layoutIfNeeded()
         }, completion: nil)
@@ -594,13 +621,13 @@ extension OverlayContainerViewController: HeightConstraintOverlayTranslationCont
             willTranslateOverlay: controller,
             transitionCoordinator: transitionCoordinator
         )
-		if transitionCoordinator.isDragging,
-			transitionCoordinator.overlayTranslationHeight > configuration.maximumNotchHeight {
-			setContentHeight(
-				height: transitionCoordinator.overlayTranslationHeight,
-				animated: false
-			)
-		}
+        if transitionCoordinator.isDragging,
+           transitionCoordinator.overlayTranslationHeight > configuration.maximumNotchHeight {
+            setContentHeight(
+                height: transitionCoordinator.overlayTranslationHeight,
+                animated: false
+            )
+        }
     }
 
     func translationControllerDidScheduleTranslations(_ translationController: OverlayTranslationController) {
