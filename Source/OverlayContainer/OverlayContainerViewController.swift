@@ -30,11 +30,6 @@ open class OverlayContainerViewController: UIViewController {
         case expandableHeight
     }
 
-    public enum DashViewStyle {
-        case none
-        case `default`
-    }
-
     /// The delegate of the container.
     weak open var delegate: OverlayContainerViewControllerDelegate? {
         set {
@@ -100,16 +95,18 @@ open class OverlayContainerViewController: UIViewController {
     internal lazy var overlayContainerView = OverlayContainerView()
     internal lazy var overlayTranslationView = OverlayTranslationView()
     internal lazy var overlayTranslationContainerView = OverlayTranslationContainerView()
-    private lazy var overlayContainerWrappedView = OverlayContainerView()
+    private lazy var overlayContainerVisibleViewContainer = OverlayContainerView()
     private lazy var groundView = GroundView()
-    public private (set) lazy var dashView = DashView(
-        frame: CGRect(
-            x: 0,
-            y: 0,
-            width: UIScreen.main.bounds.width,
-            height: 20
-        )
-    )
+	public private (set) lazy var dashView = {
+		let dashView = DashView(
+			frame: CGRect(
+				x: 0, y: 0,
+				width: UIScreen.main.bounds.width, height: 20
+			)
+		)
+		dashView.updateStyle(to: dashViewStyle)
+		return dashView
+	}()
 
     internal var meera_pinnedViewBottomConstraint: NSLayoutConstraint?
     internal var meera_finalBottomContraintValue: CGFloat = 0
@@ -138,15 +135,7 @@ open class OverlayContainerViewController: UIViewController {
         false
     }
 
-    private let dashViewStyle: DashViewStyle
-    private var dashViewHeight: CGFloat {
-        switch dashViewStyle {
-        case .default:
-            return 20
-        case .none:
-            return 0
-        }
-    }
+    private let dashViewStyle: OverlayDashViewStyle
 
     internal var meera_topConstraint: NSLayoutConstraint?
     internal var meera_bottomConstraint: NSLayoutConstraint?
@@ -174,7 +163,7 @@ open class OverlayContainerViewController: UIViewController {
     /// - returns: The new `OverlayContainerViewController` instance.
     public init(
         style: OverlayStyle = .expandableHeight,
-        dashViewStyle: DashViewStyle = .default
+				dashViewStyle: OverlayDashViewStyle = .default()
     ) {
         self.style = style
         self.dashViewStyle = dashViewStyle
@@ -183,7 +172,7 @@ open class OverlayContainerViewController: UIViewController {
 
     public required init?(coder aDecoder: NSCoder) {
         self.style = .flexibleHeight
-        self.dashViewStyle = .default
+			self.dashViewStyle = .default()
         super.init(coder: aDecoder)
     }
 
@@ -318,18 +307,22 @@ open class OverlayContainerViewController: UIViewController {
 
         overlayTranslationContainerView.addSubview(overlayTranslationView)
         overlayTranslationView.addSubview(overlayContainerView)
-        overlayContainerView.addSubview(overlayContainerWrappedView)
+        overlayContainerView.addSubview(overlayContainerVisibleViewContainer)
 
         overlayContainerView.pinToSuperview(edges: [.top, .left, .right])
-        overlayContainerWrappedView.pinToSuperview(edges: [.top, .left, .right])
+        overlayContainerVisibleViewContainer.pinToSuperview(edges: [.top, .left, .right])
 
-        contentMaxHeightConstraint = overlayContainerWrappedView.heightAnchor.constraint(
+        contentMaxHeightConstraint = overlayContainerVisibleViewContainer.heightAnchor.constraint(
             equalToConstant: UIScreen.main.bounds.height + 100
         )
 
-        if dashViewStyle == .default {
-            overlayContainerWrappedView.addSubview(dashView)
-        }
+			switch dashViewStyle {
+			case .none:
+				break
+			case .default,
+					.overlay:
+				overlayContainerVisibleViewContainer.addSubview(dashView)
+			}
 
         overlayTranslationView.pinToSuperview(edges: [.bottom])
 
@@ -347,8 +340,8 @@ open class OverlayContainerViewController: UIViewController {
         rightInsetConstraint?.isActive = true
         contentMaxHeightConstraint?.isActive = true
 
-        overlayContainerWrappedView.clipsToBounds = true
-        overlayContainerWrappedView.layer.cornerRadius = cornerRadius
+        overlayContainerVisibleViewContainer.clipsToBounds = true
+        overlayContainerVisibleViewContainer.layer.cornerRadius = cornerRadius
 
         translationHeightConstraint = overlayTranslationView.heightAnchor.constraint(equalToConstant: 0)
         switch style {
@@ -392,10 +385,21 @@ open class OverlayContainerViewController: UIViewController {
         groundView.isHidden = viewControllers.count == 1
         var truncatedViewControllers = viewControllers
         truncatedViewControllers.popLast().flatMap {
-            meera_topConstraint = $0.view.topAnchor.constraint(
-                equalTo: overlayContainerWrappedView.topAnchor,
-                constant: dashViewHeight
-            )
+
+					switch dashViewStyle {
+					case .none:
+						break
+					case .default:
+						meera_topConstraint = $0.view.topAnchor.constraint(
+							equalTo: overlayContainerVisibleViewContainer.topAnchor,
+							constant: dashViewStyle.dashViewHeight
+						)
+					case .overlay:
+						meera_topConstraint = $0.view.topAnchor.constraint(
+							equalTo: overlayContainerVisibleViewContainer.topAnchor,
+							constant: 0
+						)
+					}
 
             switch configuration.overlayBottomSafeAreaPolicy() {
             case .ignore:
@@ -418,15 +422,15 @@ open class OverlayContainerViewController: UIViewController {
             }
 
             addChild($0)
-            overlayContainerWrappedView.addSubview($0.view)
+            overlayContainerVisibleViewContainer.addSubview($0.view)
             $0.view.translatesAutoresizingMaskIntoConstraints = false
 
             NSLayoutConstraint.activate([
                 $0.view.leadingAnchor.constraint(
-                    equalTo: overlayContainerWrappedView.leadingAnchor
+                    equalTo: overlayContainerVisibleViewContainer.leadingAnchor
                 ),
                 $0.view.trailingAnchor.constraint(
-                    equalTo: overlayContainerWrappedView.trailingAnchor
+                    equalTo: overlayContainerVisibleViewContainer.trailingAnchor
                 ),
                 meera_bottomConstraint ?? $0.view.bottomAnchor.constraint(
                     equalTo: overlayContainerView.bottomAnchor
