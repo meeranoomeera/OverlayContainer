@@ -11,4 +11,11 @@ extension OverlayContainerViewController {
         self.drivingScrollView = scrollView
         loadTranslationDrivers()
     }
+	
+	public func clearExternalScrollViewDelegate() {
+		guard isViewLoaded else { return }
+		self.externalScrollViewDelegate = nil
+		self.drivingScrollView = nil
+		loadTranslationDrivers()
+	}
 }
