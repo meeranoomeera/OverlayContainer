@@ -444,6 +444,7 @@ open class OverlayContainerViewController: UIViewController {
         meera_topConstraint?.isActive = true
         meera_bottomConstraint?.isActive = true
         truncatedViewControllers.forEach { addChild($0, in: groundView) }
+			overlayContainerVisibleViewContainer.bringSubviewToFront(dashView)
         loadTranslationDrivers()
     }
 
